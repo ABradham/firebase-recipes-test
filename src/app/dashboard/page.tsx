@@ -18,6 +18,7 @@ import { useState } from "react";
 const app = initFirebase();
 const auth = getAuth(app);
 
+// TODO: Fix this! This is terrible state management and shouldn't be how this is handled in the future
 let currentUser = {} as AppUser;
 
 const Dashboard = () => {
