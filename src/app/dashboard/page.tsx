@@ -2,16 +2,23 @@
 
 import "firebase/firestore";
 import "firebase/auth";
-import { User, getAuth } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { useRouter } from "next/navigation";
 import { initFirebase } from "../../../firebase/firebaseApp";
-import { doc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
+
+import { AppUser, UserRecipeUpload } from "@/types";
+
+import { RecipeCard } from "@/components/RecipeCard";
+import { useState } from "react";
 
 const app = initFirebase();
 const auth = getAuth(app);
+
+let currentUser = {} as AppUser;
 
 const Dashboard = () => {
   const [user, loadingAuth, errorAuth] = useAuthState(auth);
@@ -29,16 +36,13 @@ const Dashboard = () => {
   return (
     <main>
       {<MyRecipesList uid={user.uid} displayName={user.displayName} />}
-      <section>
-        <h2>Add Recipe</h2>
-        <input type="text" placeholder="Search here" />
-      </section>
+      {<AddNewRecipe uid={user.uid} />}
       <button onClick={() => auth.signOut()}>Sign out</button>
     </main>
   );
 };
 
-function MyRecipesList({ uid, displayName }: User) {
+function MyRecipesList({ uid, displayName }: AppUser) {
   const userFirestoreDocRef = doc(getFirestore(app), "users", uid);
   const [userData, loading, error] = useDocument(userFirestoreDocRef, {
     snapshotListenOptions: { includeMetadataChanges: true },
@@ -50,9 +54,11 @@ function MyRecipesList({ uid, displayName }: User) {
     return <div>Error Loading User Data!</div>;
   }
 
-  const user = userData?.data() as CurrentUser;
+  // Cast data from Firestore into AppUser type [makes typescript happy :)];
+  const user = userData?.data() as AppUser;
+  currentUser = user;
 
-  // Show nothing if user has no recipes / data in the databasex
+  // Show nothing if user has no recipes / data in the database;
   if (user == undefined) {
     return <></>;
   }
@@ -75,39 +81,49 @@ function MyRecipesList({ uid, displayName }: User) {
   );
 }
 
-function RecipeCard({ name, ingredients }: Recipe) {
+function AddNewRecipe({ uid }: AppUser) {
+  const [recipeName, setRecipeName] = useState("");
+
+  const onAddRecipe = async () => {
+    //TODO: Firebase stuff to create new user / update existing user;
+    // Create reference to existing (or non-existant) document with current UID in "users" collection
+    const currentUserRef = doc(getFirestore(app), "users", uid);
+
+    // Create new data by uploading
+    const newData: UserRecipeUpload = {
+      displayName: currentUser.displayName,
+      recipes: [
+        ...currentUser.recipes,
+        {
+          name: recipeName,
+          ingredients: [],
+        },
+      ],
+      photoURL: currentUser.photoURL,
+    };
+
+    // Use `setDoc` since it creates new docs by default if there is no doc with given id
+    await setDoc(currentUserRef, newData);
+  };
   return (
     <div>
-      <h3>{name}</h3>
-      <ul>
-        {ingredients.map((ingredient: Ingredient) => {
-          return (
-            <li key={ingredient.name}>
-              {ingredient.name} -{ingredient.type}
-            </li>
-          );
-        })}
-      </ul>
+      <input
+        placeholder="Recipe Name"
+        onChange={(e) => {
+          setRecipeName(e.target.value);
+        }}
+      />
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          onAddRecipe();
+          console.log("Clicked!");
+        }}
+      >
+        Create Recipe
+      </button>
     </div>
   );
-}
-
-interface CurrentUser {
-  recipes: Array<Recipe>;
-  displayName: string | null;
-  uid: string;
-}
-
-interface Ingredient {
-  name: string;
-  type: string;
-  asignee: string;
-}
-
-interface Recipe {
-  ingredients: Array<Ingredient>;
-  name: string;
-  completed?: boolean;
 }
 
 export default Dashboard;
