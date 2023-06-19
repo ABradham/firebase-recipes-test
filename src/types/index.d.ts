@@ -15,10 +15,18 @@ export interface Ingredient {
     name: string;
     type: string;
     asignee: string;
+    // asigneeDisplayName?: string | null;
+    // asigneePhotoURL?: string | null;
+    retrieved: boolean;
+}
+
+export interface UserSearchProfile {
+    uid: string;
+    photoURL: string;
+    displayName: string;
 }
   
 export interface Recipe {
     ingredients: Array<Ingredient>;
     name: string;
-    completed?: boolean;
 }

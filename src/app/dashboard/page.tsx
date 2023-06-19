@@ -4,10 +4,10 @@ import "firebase/firestore";
 import "firebase/auth";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { initFirebase } from "../../../firebase/firebaseApp";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { useRouter } from "next/navigation";
-import { initFirebase } from "../../../firebase/firebaseApp";
 import { doc, setDoc } from "firebase/firestore";
 
 import { AppUser, UserRecipeUpload } from "@/types";
@@ -36,14 +36,20 @@ const Dashboard = () => {
 
   return (
     <main>
-      {<MyRecipesList uid={user.uid} displayName={user.displayName} />}
+      {
+        <MyRecipesList
+          uid={user.uid}
+          displayName={user.displayName}
+          photoURL={user.photoURL!}
+        />
+      }
       {<AddNewRecipe uid={user.uid} />}
       <button onClick={() => auth.signOut()}>Sign out</button>
     </main>
   );
 };
 
-function MyRecipesList({ uid, displayName }: AppUser) {
+function MyRecipesList({ uid, displayName, photoURL }: AppUser) {
   const userFirestoreDocRef = doc(getFirestore(app), "users", uid);
   const [userData, loading, error] = useDocument(userFirestoreDocRef, {
     snapshotListenOptions: { includeMetadataChanges: true },
@@ -57,11 +63,19 @@ function MyRecipesList({ uid, displayName }: AppUser) {
 
   // Cast data from Firestore into AppUser type [makes typescript happy :)];
   const user = userData?.data() as AppUser;
-  currentUser = user;
+  currentUser = user; // Page-level state variable!!!
 
   // Show nothing if user has no recipes / data in the database;
+  // Also creates new user
   if (user == undefined) {
-    return <></>;
+    const createNewUser: AppUser = {
+      displayName: displayName,
+      photoURL: photoURL,
+      recipes: [],
+      uid: uid,
+    };
+    setDoc(userFirestoreDocRef, createNewUser);
+    return <>Creating new profile, hang tight!</>;
   }
 
   return (
@@ -128,30 +142,3 @@ function AddNewRecipe({ uid }: AppUser) {
 }
 
 export default Dashboard;
-
-//  const fetcthCurrentUserRecipes = async () => {
-//     const docRef = doc(getFirestore(app), "users", user.uid);
-//     const docSnap = await getDoc(docRef);
-//       setRecipes(docSnap.data());
-//   };
-
-// const [asigneeImageUrl, setAsigneeImageURL] = useState("");
-// useEffect(() => {
-//   const fetchAssigneeImage = async (uid: string) => {
-//     const docRef = doc(getFirestore(app), "users", uid);
-//     const docSnap = await getDoc(docRef);
-//     setAsigneeImageURL(setdocSnap.data().photoURL);
-//   };
-// }, []);
-
-// // Fetch Recipes Specific to Signed In User
-// useEffect(() => {
-//   const fetchPersonalRecipes = async () => {
-//     if (user) {
-//       const docRef = doc(getFirestore(app), "users", user!.uid);
-//       const docSnap = await getDoc(docRef);
-//       setPersonalRecipes(docSnap.data()!.recipes);
-//     }
-//   };
-//   fetchPersonalRecipes();
-// }, []);
