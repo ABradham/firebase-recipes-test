@@ -3,16 +3,19 @@
 import "firebase/firestore";
 import "firebase/auth";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { collection, getFirestore } from "firebase/firestore";
 import { initFirebase } from "../../../firebase/firebaseApp";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { useRouter } from "next/navigation";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDocs } from "firebase/firestore";
 
-import { AppUser, UserRecipeUpload } from "@/types";
+import { AppUser, Ingredient, UserRecipeUpload, Recipe, User } from "@/types";
 
 import { RecipeCard } from "@/components/RecipeCard";
+import { IngredientTableData, columns } from "./columns";
+import { DataTable } from "./data-table";
+
 import { useState } from "react";
 
 const app = initFirebase();
@@ -88,6 +91,7 @@ function MyRecipesList({ uid, displayName, photoURL }: AppUser) {
               name={recipe.name}
               ingredients={recipe.ingredients}
               key={i}
+              uid={user.uid}
             />
           );
         })}
@@ -100,7 +104,6 @@ function AddNewRecipe({ uid }: AppUser) {
   const [recipeName, setRecipeName] = useState("");
 
   const onAddRecipe = async () => {
-    //TODO: Firebase stuff to create new user / update existing user;
     // Create reference to existing (or non-existant) document with current UID in "users" collection
     const currentUserRef = doc(getFirestore(app), "users", uid);
 
