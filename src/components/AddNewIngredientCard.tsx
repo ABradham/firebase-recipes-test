@@ -1,6 +1,6 @@
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import { initFirebase } from "../../firebase/firebaseApp";
-import { Recipe, Ingredient, UserSearchProfile, AppUser } from "@/types";
+import { Recipe, Ingredient } from "@/types";
 import { useState } from "react";
 import { User } from "@/types";
 import { getAuth } from "firebase/auth";

@@ -4,17 +4,67 @@ import {
   getFirestore,
   doc,
   getDoc,
+  setDoc,
 } from "firebase/firestore";
 import { initFirebase } from "../../firebase/firebaseApp";
 import { useCollectionOnce } from "react-firebase-hooks/firestore";
 import { useEffect, useState } from "react";
 
-import { Recipe, Ingredient, UserSearchProfile, AppUser } from "@/types";
+import { Recipe, Ingredient, UserSearchProfile, AppUser, User } from "@/types";
 import AddNewIngredient from "./AddNewIngredientCard";
 import { getAuth } from "firebase/auth";
 
+import { IngredientTableData, columns } from "@/app/dashboard/columns";
+import { DataTable } from "@/app/dashboard/data-table";
+
 const app = initFirebase();
 const auth = getAuth(app);
+
+const changeIngredientRetrievedState = async (
+  checkboxState: boolean,
+  recipeName: string,
+  ingredientName: string
+) => {
+  // Get document containing this recipe
+  if (auth.currentUser) {
+    const ref = doc(getFirestore(app), "users", auth.currentUser.uid);
+    const docSnap = await getDoc(ref);
+    if (docSnap.exists()) {
+      // Convert to User object
+      const userData = docSnap.data() as User;
+
+      // Filter through recipes to find one with matching name
+      const currentRecipeIndex = userData.recipes.findIndex((recipe) => {
+        console.log(
+          "recipeName: " + recipeName + "; recipe.name: " + recipe.name
+        );
+        recipe.name === recipeName;
+      });
+      const currentRecipe = userData.recipes.find(
+        (recipe) => recipe.name === recipeName
+      );
+
+      // Look for ingredient in recipe
+      const currentIngredient = currentRecipe?.ingredients.find(
+        (ingredient) => ingredient.name === ingredientName
+      );
+      const currentIngredientIndex = currentRecipe?.ingredients.findIndex(
+        (ingredient) => ingredient.name === ingredientName
+      );
+      currentIngredient!.retrieved = checkboxState;
+
+      // Modify current `User`'s ingredients list to reflect changes in state
+      currentRecipe!.ingredients[currentIngredientIndex!].retrieved =
+        checkboxState;
+
+      //@ts-ignore
+      userData.recipes[currentRecipeIndex] = currentRecipe;
+
+      // Send updates to firestore
+      setDoc(ref, userData);
+    }
+  }
+};
 
 // @ts-ignore
 export function RecipeCard({ name, ingredients }: Recipe) {
@@ -66,7 +116,13 @@ export function RecipeCard({ name, ingredients }: Recipe) {
               <input
                 type="checkbox"
                 checked={ingredient.retrieved}
-                onChange={(e) => {}}
+                onChange={(e) => {
+                  changeIngredientRetrievedState(
+                    e.target.checked,
+                    name,
+                    ingredient.name
+                  );
+                }}
               />
               {!retrieved
                 ? "Loading User Display Name..."
@@ -75,6 +131,12 @@ export function RecipeCard({ name, ingredients }: Recipe) {
           );
         })}
       </ul>
+      <div className="container mx-auto py-10">
+        <DataTable
+          columns={columns}
+          data={ingredients as Array<IngredientTableData>}
+        />
+      </div>
       <AddNewIngredient name={name} />
     </div>
   );

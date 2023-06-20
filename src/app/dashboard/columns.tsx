@@ -8,21 +8,38 @@ export type IngredientTableData = {
   name: string;
   type: string;
   asignee: string;
-  photoURL: string;
-  recieved: boolean;
+  retrieved: boolean;
 };
 
 export const columns: ColumnDef<IngredientTableData>[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: () => <div className="text-right">Ingredient Name</div>,
+    cell: ({ row }) => {
+      const ingName: string = row.getValue("name");
+
+      return <div className="text-right font-medium">{ingName}</div>;
+    },
   },
   {
     accessorKey: "asignee",
-    header: "Asignee",
+    header: () => <div className="text-right">Assigned To</div>,
+    cell: ({ row }) => {
+      const asigName: string = row.getValue("asignee");
+      return <div className="text-right font-medium">{asigName}</div>;
+    },
   },
   {
-    accessorKey: "recieved",
-    header: "Received",
+    accessorKey: "retrieved",
+    header: () => <div className="text-right">Completed</div>,
+    cell: ({ row }) => {
+      const retrieved: boolean = row.getValue("retrieved");
+      console.log(row.getValue("retrieved"));
+      if (retrieved) {
+        return <div className="text-right font-medium green-700">True</div>;
+      } else {
+        return <div className="text-right font-medium red-700">False</div>;
+      }
+    },
   },
 ];
