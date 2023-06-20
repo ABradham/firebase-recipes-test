@@ -30,3 +30,9 @@ export interface Recipe {
     ingredients: Array<Ingredient>;
     name: string;
 }
+
+export interface User{
+    displayName: string;
+    photoURL: string;
+    recipes: Array<Recipe>;
+}

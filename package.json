@@ -9,16 +9,22 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tanstack/react-table": "^8.9.2",
     "@types/node": "20.3.1",
     "@types/react": "18.2.12",
     "@types/react-dom": "18.2.5",
+    "class-variance-authority": "^0.6.0",
+    "clsx": "^1.2.1",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.5",
     "firebase": "^9.22.2",
+    "lucide-react": "^0.246.0",
     "next": "13.4.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-firebase-hooks": "^5.1.1",
+    "tailwind-merge": "^1.13.2",
+    "tailwindcss-animate": "^1.0.6",
     "typescript": "5.1.3"
   }
 }

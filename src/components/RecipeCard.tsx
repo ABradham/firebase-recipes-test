@@ -1,18 +1,29 @@
-import { QuerySnapshot, collection, getFirestore } from "firebase/firestore";
+import {
+  QuerySnapshot,
+  collection,
+  getFirestore,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { initFirebase } from "../../firebase/firebaseApp";
-import { Recipe, Ingredient, UserSearchProfile, AppUser } from "@/types";
-import { useCollection } from "react-firebase-hooks/firestore";
+import { useCollectionOnce } from "react-firebase-hooks/firestore";
 import { useEffect, useState } from "react";
 
-const app = initFirebase();
+import { Recipe, Ingredient, UserSearchProfile, AppUser } from "@/types";
+import AddNewIngredient from "./AddNewIngredientCard";
+import { getAuth } from "firebase/auth";
 
+const app = initFirebase();
+const auth = getAuth(app);
+
+// @ts-ignore
 export function RecipeCard({ name, ingredients }: Recipe) {
   const [userSearchInfo, setUserSearchInfo] = useState(
     {} as { [key: string]: UserSearchProfile }
   );
   const [retrieved, setRetrieved] = useState(false);
 
-  const [value, loading, error] = useCollection(
+  const [value, loading, error] = useCollectionOnce(
     collection(getFirestore(app), "users")
   );
 
@@ -21,11 +32,15 @@ export function RecipeCard({ name, ingredients }: Recipe) {
       const profiles = getUniqueUsers(value);
       setUserSearchInfo(profiles);
       setRetrieved(true);
+      console.log(profiles);
     }
   }, [value]);
 
-  const getUniqueUsers = (fromServer: QuerySnapshot<DocumentData>) => {
+  const getUniqueUsers = (
+    fromServer: QuerySnapshot<DocumentData>
+  ): { [key: string]: UserSearchProfile } => {
     let unqiueUsers = new Map() as Map<string, UserSearchProfile>;
+    console.log(fromServer.docs);
     fromServer.docs.forEach((doc) => {
       const currentUserId = doc.id;
       const userData = doc.data() as AppUser;
@@ -60,6 +75,7 @@ export function RecipeCard({ name, ingredients }: Recipe) {
           );
         })}
       </ul>
+      <AddNewIngredient name={name} />
     </div>
   );
 }
