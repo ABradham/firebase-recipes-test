@@ -1,7 +1,7 @@
 export interface UserRecipeUpload {
-    recipes: Array<Recipe>;
-    displayName: string | null;
-    photoURL: string;
+    collaborators: UserSearchProfile[];
+    ingredients: Ingredient[];
+    name: string;
 }
 
 export interface AppUser {
@@ -9,6 +9,7 @@ export interface AppUser {
     displayName: string | null;
     uid: string;
     photoURL: string;
+    ownedRecipes: string[];
 }
   
 export interface Ingredient {
@@ -35,4 +36,26 @@ export interface User{
     displayName: string;
     photoURL: string;
     recipes: Array<Recipe>;
+}
+
+export type IngredientTableData = {
+  name: string;
+  type: string;
+  asignee: string;
+  retrieved: boolean;
+};
+
+
+interface RecipeData {
+  collaborators: Array<UserSearchProfile>;
+  name: string;
+  ingredients: Array<IngredientTableData>;
+};
+
+interface IngredientsWithID {
+  id: string;
+  name: string;
+  type: string;
+  asignee: string;
+  retreived: boolean;
 }

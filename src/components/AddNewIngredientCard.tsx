@@ -4,6 +4,7 @@ import { Recipe, Ingredient } from "@/types";
 import { useState } from "react";
 import { User } from "@/types";
 import { getAuth } from "firebase/auth";
+import TextField from "@mui/material/TextField";
 
 const app = initFirebase();
 const auth = getAuth(app);
@@ -67,6 +68,7 @@ export default function AddNewIngredient({ name }: Recipe) {
         placeholder="Asignee"
         onChange={(e) => setNewIngredientAsignee(e.target.value)}
       />
+      <TextField id="outlined-basic" label="Outlined" variant="outlined" />
       <button
         onClick={() =>
           addNewIngredientToRecipe(

@@ -8,15 +8,13 @@ import { initFirebase } from "../../../firebase/firebaseApp";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { useRouter } from "next/navigation";
-import { doc, setDoc, getDocs } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
-import { AppUser, Ingredient, UserRecipeUpload, Recipe, User } from "@/types";
+import { AppUser } from "@/types";
 
-import { RecipeCard } from "@/components/RecipeCard";
-import { IngredientTableData, columns } from "./columns";
-import { DataTable } from "./data-table";
-
-import { useState } from "react";
+import { Button, Container, Typography } from "@mui/material";
+import MUIDataTable from "@/components/Table";
+import AddNewRecipe from "@/components/AddNewRecipe";
 
 const app = initFirebase();
 const auth = getAuth(app);
@@ -38,7 +36,7 @@ const Dashboard = () => {
   }
 
   return (
-    <main>
+    <Container>
       {
         <MyRecipesList
           uid={user.uid}
@@ -46,9 +44,10 @@ const Dashboard = () => {
           photoURL={user.photoURL!}
         />
       }
-      {<AddNewRecipe uid={user.uid} />}
-      <button onClick={() => auth.signOut()}>Sign out</button>
-    </main>
+      <Button variant="outlined" onClick={() => auth.signOut()}>
+        Sign out
+      </Button>
+    </Container>
   );
 };
 
@@ -82,64 +81,13 @@ function MyRecipesList({ uid, displayName, photoURL }: AppUser) {
   }
 
   return (
-    <>
-      <h1>{displayName}'s Recipes</h1>
-      <div>
-        {user.recipes.map((recipe, i) => {
-          return (
-            <RecipeCard
-              name={recipe.name}
-              ingredients={recipe.ingredients}
-              key={i}
-              uid={user.uid}
-            />
-          );
-        })}
-      </div>
-    </>
-  );
-}
-
-function AddNewRecipe({ uid }: AppUser) {
-  const [recipeName, setRecipeName] = useState("");
-
-  const onAddRecipe = async () => {
-    // Create reference to existing (or non-existant) document with current UID in "users" collection
-    const currentUserRef = doc(getFirestore(app), "users", uid);
-
-    // Create new data by uploading
-    const newData: UserRecipeUpload = {
-      displayName: currentUser.displayName,
-      recipes: [
-        ...currentUser.recipes,
-        {
-          name: recipeName,
-          ingredients: [],
-        },
-      ],
-      photoURL: currentUser.photoURL,
-    };
-
-    // Use `setDoc` since it creates new docs by default if there is no doc with given id
-    await setDoc(currentUserRef, newData);
-  };
-  return (
     <div>
-      <input
-        placeholder="Recipe Name"
-        onChange={(e) => {
-          setRecipeName(e.target.value);
-        }}
-      />
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          onAddRecipe();
-          console.log("Clicked!");
-        }}
-      >
-        Create Recipe
-      </button>
+      <Typography variant="h1">{displayName}'s Recipes</Typography>
+      {user.ownedRecipes &&
+        user.ownedRecipes.map((recipeID) => {
+          return <MUIDataTable recipeID={recipeID} key={recipeID} />;
+        })}
+      <AddNewRecipe />
     </div>
   );
 }

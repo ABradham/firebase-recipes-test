@@ -1,15 +1,11 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import { Badge } from "../../../components/ui/badge";
+import { IngredientTableData } from "@/types";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type IngredientTableData = {
-  name: string;
-  type: string;
-  asignee: string;
-  retrieved: boolean;
-};
 
 export const columns: ColumnDef<IngredientTableData>[] = [
   {
@@ -34,11 +30,10 @@ export const columns: ColumnDef<IngredientTableData>[] = [
     header: () => <div className="text-right">Completed</div>,
     cell: ({ row }) => {
       const retrieved: boolean = row.getValue("retrieved");
-      console.log(row.getValue("retrieved"));
       if (retrieved) {
-        return <div className="text-right font-medium green-700">True</div>;
+        return <Badge>True</Badge>;
       } else {
-        return <div className="text-right font-medium red-700">False</div>;
+        return <Badge>False</Badge>;
       }
     },
   },

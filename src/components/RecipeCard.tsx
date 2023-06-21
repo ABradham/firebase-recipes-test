@@ -16,6 +16,8 @@ import { getAuth } from "firebase/auth";
 
 import { IngredientTableData, columns } from "@/app/dashboard/columns";
 import { DataTable } from "@/app/dashboard/data-table";
+import { Typography } from "@mui/material";
+import MUIDataTable from "./Table";
 
 const app = initFirebase();
 const auth = getAuth(app);
@@ -35,9 +37,6 @@ const changeIngredientRetrievedState = async (
 
       // Filter through recipes to find one with matching name
       const currentRecipeIndex = userData.recipes.findIndex((recipe) => {
-        console.log(
-          "recipeName: " + recipeName + "; recipe.name: " + recipe.name
-        );
         recipe.name === recipeName;
       });
       const currentRecipe = userData.recipes.find(
@@ -82,7 +81,6 @@ export function RecipeCard({ name, ingredients }: Recipe) {
       const profiles = getUniqueUsers(value);
       setUserSearchInfo(profiles);
       setRetrieved(true);
-      console.log(profiles);
     }
   }, [value]);
 
@@ -90,7 +88,6 @@ export function RecipeCard({ name, ingredients }: Recipe) {
     fromServer: QuerySnapshot<DocumentData>
   ): { [key: string]: UserSearchProfile } => {
     let unqiueUsers = new Map() as Map<string, UserSearchProfile>;
-    console.log(fromServer.docs);
     fromServer.docs.forEach((doc) => {
       const currentUserId = doc.id;
       const userData = doc.data() as AppUser;
@@ -107,8 +104,8 @@ export function RecipeCard({ name, ingredients }: Recipe) {
 
   return (
     <div>
-      <h3>{name}</h3>
-      <ul>
+      <Typography variant="h3">{name}</Typography>
+      {/* <ul>
         {ingredients.map((ingredient: Ingredient) => {
           return (
             <li key={ingredient.name}>
@@ -130,7 +127,7 @@ export function RecipeCard({ name, ingredients }: Recipe) {
             </li>
           );
         })}
-      </ul>
+      </ul> */}
       <div className="container mx-auto py-10">
         <DataTable
           columns={columns}
@@ -138,6 +135,7 @@ export function RecipeCard({ name, ingredients }: Recipe) {
         />
       </div>
       <AddNewIngredient name={name} />
+      {/* <MUIDataTable data={ingredients as IngredientTableData[]} /> */}
     </div>
   );
 }
