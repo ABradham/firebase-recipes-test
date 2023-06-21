@@ -85,7 +85,8 @@ function MyRecipesList({ uid, displayName, photoURL }: AppUser) {
       <Typography variant="h1">{displayName}'s Recipes</Typography>
       {user.ownedRecipes &&
         user.ownedRecipes.map((recipeID) => {
-          return <MUIDataTable recipeID={recipeID} key={recipeID} />;
+          if (recipeID != "")
+            return <MUIDataTable recipeID={recipeID} key={recipeID} />;
         })}
       <AddNewRecipe />
     </div>

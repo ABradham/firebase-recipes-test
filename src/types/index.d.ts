@@ -16,8 +16,6 @@ export interface Ingredient {
     name: string;
     type: string;
     asignee: string;
-    // asigneeDisplayName?: string | null;
-    // asigneePhotoURL?: string | null;
     retrieved: boolean;
 }
 
@@ -57,5 +55,5 @@ interface IngredientsWithID {
   name: string;
   type: string;
   asignee: string;
-  retreived: boolean;
+  retrieved: boolean;
 }

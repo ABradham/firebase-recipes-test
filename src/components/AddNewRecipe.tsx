@@ -10,7 +10,6 @@ import {
 import { initFirebase } from "../../firebase/firebaseApp";
 import { getAuth } from "firebase/auth";
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 
 const app = initFirebase();
 
@@ -45,6 +44,7 @@ export default function AddNewRecipe() {
 
     // Send updated user object back to firestore
     await setDoc(userDocRef, userInFirestore);
+    setRecipeName("");
   };
   return (
     <div>
@@ -54,6 +54,7 @@ export default function AddNewRecipe() {
         onChange={(e) => {
           setRecipeName(e.target.value);
         }}
+        value={recipeName}
       />
       <Button
         variant="contained"
