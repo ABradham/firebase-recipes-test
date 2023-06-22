@@ -1,13 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { NextPage } from "next";
 import styles from "./page.module.css";
 import { initFirebase } from "../../firebase/firebaseApp";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
 
 const Home: NextPage = () => {
   // Instance of firebase app and auth provider
