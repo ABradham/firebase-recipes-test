@@ -3,7 +3,7 @@
 import "firebase/firestore";
 import "firebase/auth";
 import { getAuth } from "firebase/auth";
-import { collection, getFirestore } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { initFirebase } from "../../../firebase/firebaseApp";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocument } from "react-firebase-hooks/firestore";
@@ -75,6 +75,7 @@ function MyRecipesList({ uid, displayName, photoURL }: AppUser) {
       photoURL: photoURL,
       recipes: [],
       uid: uid,
+      ownedRecipes: [],
     };
     setDoc(userFirestoreDocRef, createNewUser);
     return <>Creating new profile, hang tight!</>;

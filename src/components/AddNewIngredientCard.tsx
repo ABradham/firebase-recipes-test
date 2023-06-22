@@ -1,10 +1,10 @@
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import { initFirebase } from "../../firebase/firebaseApp";
-import { Ingredient, Recipe, RecipeData } from "@/types";
+import { Ingredient, RecipeData } from "@/types";
 import { useState } from "react";
 import { getAuth } from "firebase/auth";
 import TextField from "@mui/material/TextField";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 
 const app = initFirebase();
 const auth = getAuth(app);
@@ -41,7 +41,7 @@ export default function AddNewIngredient({ recipeID }) {
 
   return (
     <div>
-      <h3>Add new Ingredient</h3>
+      <Typography variant="h4">Add New Ingredient</Typography>
       <TextField
         label="Ingredient Name"
         variant="outlined"

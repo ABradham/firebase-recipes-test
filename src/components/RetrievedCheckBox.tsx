@@ -31,7 +31,6 @@ export default function RetrievedCheckboxComponent(
     // Set doc to update remotely on firebase (should trigger a re-render of the table)
     setDoc(recipeDocRef, currRecipe);
   };
-  console.log(cellValues.value);
   return (
     <Checkbox
       checked={cellValues.value}

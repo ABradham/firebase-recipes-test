@@ -1,19 +1,15 @@
-import {
-  DataGrid,
-  GridCellParams,
-  GridColDef,
-  GridTreeNode,
-} from "@mui/x-data-grid";
-import { doc, getFirestore } from "firebase/firestore";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { collection, doc, getDocs, getFirestore } from "firebase/firestore";
 import { initFirebase } from "../../firebase/firebaseApp";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { Avatar, Skeleton, Typography } from "@mui/material";
 import { IngredientsWithID, RecipeData, UserSearchProfile } from "@/types";
 import RetrievedCheckboxComponent from "./RetrievedCheckBox";
 import AddNewIngredient from "./AddNewIngredientCard";
+import { useEffect, useState } from "react";
 
 let globalRecipeID = "";
-let globalRecipeData: RecipeData = {} as RecipeData;
+let globalRecipeCollaborators: Map<string, UserSearchProfile> = new Map();
 
 const columns: GridColDef[] = [
   { field: "name", headerName: "Item", width: 300 },
@@ -21,18 +17,16 @@ const columns: GridColDef[] = [
   {
     field: "asignee",
     renderCell: (cellValues) => {
-      const recipeData: RecipeData = globalRecipeData as RecipeData;
-      const allCollaborators: UserSearchProfile[] = recipeData.collaborators;
-
-      let uidsToProfiles: Map<string, UserSearchProfile> = new Map();
-      allCollaborators.forEach((user) => {
-        uidsToProfiles.set(user.uid, user);
-      });
+      console.log(
+        JSON.stringify(Object.fromEntries(globalRecipeCollaborators))
+      );
       return (
         <>
-          <Avatar src={uidsToProfiles.get(cellValues.value)!.photoURL} />
+          <Avatar
+            src={globalRecipeCollaborators.get(cellValues.value)!.photoURL}
+          />
           <Typography style={{ paddingLeft: 20 }}>
-            {uidsToProfiles.get(cellValues.value)!.displayName}
+            {globalRecipeCollaborators.get(cellValues.value)!.displayName}
           </Typography>
         </>
       );
@@ -71,19 +65,37 @@ const recipeDataToRows = (recipeData: RecipeData): IngredientsWithID[] => {
   return rows;
 };
 
-const handleOnCellClicked = async (
-  params: GridCellParams<any, unknown, unknown, GridTreeNode>
-) => {};
-
 //@ts-ignore
 export default function MUIDataTable({ recipeID }) {
+  const [userDataRetrieved, setUserDataRetrieved] = useState(false);
+  useEffect(() => {
+    const getGlobalRecipeCollaborators = async () => {
+      const allUsers: UserSearchProfile[] = [];
+      let uidsToProfiles: Map<string, UserSearchProfile> = new Map();
+
+      const usersRef = collection(getFirestore(app), "users");
+      const fromFirestore = await getDocs(usersRef);
+      fromFirestore.docs.forEach((doc) => {
+        console.log(doc.data());
+        allUsers.push(doc.data() as UserSearchProfile);
+      });
+
+      allUsers.forEach((user) => {
+        uidsToProfiles.set(user.uid, user);
+      });
+      globalRecipeCollaborators = uidsToProfiles;
+      setUserDataRetrieved(true);
+    };
+
+    getGlobalRecipeCollaborators();
+  }, []);
   // Given a string with the recipe's ID, we can fetch all recipe data from firestore;
   const recipeFirestoreRef = doc(getFirestore(app), "recipes", recipeID);
   const [data, loading, error] = useDocument(recipeFirestoreRef, {
     snapshotListenOptions: { includeMetadataChanges: true },
   });
 
-  if (loading || error) {
+  if (!data || loading || error) {
     return <Skeleton />;
   }
 
@@ -92,9 +104,12 @@ export default function MUIDataTable({ recipeID }) {
 
   // Update globals before rendering table
   globalRecipeID = recipeID;
-  globalRecipeData = recipeData;
 
   const rows = recipeDataToRows(recipeData);
+
+  if (!userDataRetrieved) {
+    return <Skeleton />;
+  }
   return (
     <div
       style={{
@@ -112,10 +127,9 @@ export default function MUIDataTable({ recipeID }) {
           columns={columns}
           initialState={{
             pagination: {
-              paginationModel: { page: 0, pageSize: 5 },
+              paginationModel: { page: 0, pageSize: 10 },
             },
           }}
-          onCellClick={(params) => handleOnCellClicked(params)}
         />
       )}
       <AddNewIngredient recipeID={globalRecipeID} />
