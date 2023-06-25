@@ -1,4 +1,4 @@
-import { Ingredient, RecipeData } from "@/types";
+import { Ingredient, RecipeData } from "../types";
 import { Checkbox } from "@mui/material";
 import { GridRenderCellParams, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";

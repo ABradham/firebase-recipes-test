@@ -10,7 +10,7 @@ import { useDocument } from "react-firebase-hooks/firestore";
 import { useRouter } from "next/navigation";
 import { doc, setDoc } from "firebase/firestore";
 
-import { AppUser } from "@/types";
+import { AppUser } from "../../types";
 
 import { Button, Container, Typography } from "@mui/material";
 import MUIDataTable from "@/components/Table";

@@ -3,7 +3,7 @@ import { collection, doc, getDocs, getFirestore } from "firebase/firestore";
 import { initFirebase } from "../../firebase/firebaseApp";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { Avatar, Skeleton, Typography } from "@mui/material";
-import { IngredientsWithID, RecipeData, UserSearchProfile } from "@/types";
+import { IngredientsWithID, RecipeData, UserSearchProfile } from "../types";
 import RetrievedCheckboxComponent from "./RetrievedCheckBox";
 import AddNewIngredient from "./AddNewIngredientCard";
 import { useEffect, useState } from "react";

@@ -41,14 +41,14 @@ export type IngredientTableData = {
   type: string;
   asignee: string;
   retrieved: boolean;
-};
+}
 
 
 interface RecipeData {
   collaborators: Array<UserSearchProfile>;
   name: string;
   ingredients: Array<IngredientTableData>;
-};
+}
 
 interface IngredientsWithID {
   id: string;
@@ -56,4 +56,20 @@ interface IngredientsWithID {
   type: string;
   asignee: string;
   retrieved: boolean;
+}
+
+interface PalmAIRequest {
+  user: UserSearchProfile;
+  dish: string;
+}
+
+interface PalmAIStatus {
+  state: string;
+}
+
+interface PalmAIDocument {
+    dish: string;
+    user: UserSearchProfile;
+    output: string;
+    status: PalmAIStatus;
 }

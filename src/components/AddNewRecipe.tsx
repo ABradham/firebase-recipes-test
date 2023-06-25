@@ -1,4 +1,4 @@
-import { AppUser, UserRecipeUpload } from "@/types";
+import { AppUser, UserRecipeUpload } from "../types";
 import { Button, TextField } from "@mui/material";
 import {
   collection,
